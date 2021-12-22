@@ -8,7 +8,11 @@ typedef struct IUnknown IUnknown;
 #include <windows.h>
 #include <wincodec.h>
 #include <shobjidl.h>
+#ifdef _MSC_VER
 #include <atlbase.h>
+#else
+#include "build/sources/ccomptr.h"
+#endif
 #include <d2d1.h>
 #pragma comment(lib, "d2d1")
 

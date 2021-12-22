@@ -1,3 +1,3 @@
 #include "HResultError.h"
 
-HResultError::HResultError(char const* const message) noexcept
+// HResultError::HResultError(char const* const message) noexcept

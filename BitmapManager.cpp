@@ -1,6 +1,8 @@
 #include "BitmapManager.h"
 #include "HResultError.h"
 
+#include <iostream>
+
 namespace graphics {
 
 	BitmapManager::BitmapManager()

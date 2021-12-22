@@ -100,7 +100,7 @@ namespace windowadapter {
             D2D1_SIZE_F size = renderTargetPointer->GetSize();
             const float x = size.width / 2;
             const float y = size.height / 2;
-            const float radius = min(x, y);
+            const float radius = std::min(x, y);
             ellipse = D2D1::Ellipse(D2D1::Point2F(x, y), radius, radius);
         }
     }
