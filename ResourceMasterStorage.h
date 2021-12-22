@@ -9,8 +9,8 @@ namespace resource {
 
 	class ResourceMasterStorage {
 	private:
-		std::unordered_map<std::string&, FileLoadable&> fileExtensionToResourceTypeMap{};
-		std::unordered_map<std::string&, ManifestLoadable&> manifestPrefixToResourceTypeMap{};
+		std::unordered_map<std::string, FileLoadable&> fileExtensionToResourceTypeMap{};
+		std::unordered_map<std::string, ManifestLoadable&> manifestPrefixToResourceTypeMap{};
 
 	public:
 		IResource* loadFile(const FileOrigin& fileOrigin);
