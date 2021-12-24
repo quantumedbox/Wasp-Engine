@@ -4,34 +4,101 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <algorithm>
+#include <functional>
 
 #include "Resource.h"
+#include "IResourceStorage.h"
+#include "ResourceLoader.h"
+#include "UnsupportedOperationError.h"
 
 namespace resource {
 
     template <typename T>
-    class ResourceStorage {
-        using ResourceMap = std::unordered_map<std::string&, Resource<T>>;
+    class ResourceStorage : public IResourceStorage{
+        using ResourceMap = 
+            std::unordered_map<std::wstring, std::shared_ptr<Resource<T>>>;
 
-    private:
+    protected:
         ResourceMap resourceMap{};
+        ResourceLoader* resourceLoaderPointer{}; //for reloading? is this dumb?
 
     public:
         ResourceStorage() = default;
         virtual ~ResourceStorage() = default;
 
-        virtual std::shared_ptr<T> get(const std::string& id) {
+        void unload(const std::wstring& id) override {
             auto found{ resourceMap.find(id) };
             if (found != resourceMap.end()) {
-                return found->getDataPointerCopy();
-            }
-            else {
-                return std::make_shared(nullptr);
+                std::get<1>(*found)->unloadData();
             }
         }
-        virtual void unload(const std::string& id) = 0;
-        virtual void reload(const std::string& id) = 0;
-        virtual void remove(const std::string& id) = 0;
-        virtual void write(const std::string& id) const = 0;
+
+        void reload(const std::wstring& id) override {
+            if (resourceLoaderPointer) {
+                auto found{ resourceMap.find(id) };
+                if (found != resourceMap.end()) {
+                    const ResourceOriginVariant origin{ 
+                        std::get<1>(*found)->getOrigin()
+                    };
+                    switch (origin.index()) {
+                        case 0: {
+                            FileOrigin const* fileTest{
+                                std::get_if<FileOrigin>(&origin)
+                            };
+                            if (fileTest) {
+                                resourceLoaderPointer->loadFile(*fileTest);
+                            }
+                            break;
+                        }
+                        case 1: {
+                            ManifestOrigin const* manifestTest{
+                                std::get_if<ManifestOrigin>(&origin)
+                            };
+                            if (manifestTest) {
+                                resourceLoaderPointer->loadManifestEntry(
+                                    *manifestTest
+                                );
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            else {
+                throw std::runtime_error{ "Error trying to reload without loader" };
+            }
+        }
+
+        void remove(const std::wstring& id) override {
+            //calls parent.removeChild in destructor
+            resourceMap.erase(id);
+        }
+
+        virtual std::shared_ptr<T> get(const std::wstring& id) {
+            auto found{ resourceMap.find(id) };
+            if (found != resourceMap.end()) {
+                return std::get<1>(*found)->getDataPointerCopy();
+            }
+            else {
+                return nullptr;
+            }
+        }
+
+        void setLoader(ResourceLoader* resourceLoaderPointer) {
+            this->resourceLoaderPointer = resourceLoaderPointer;
+        }
+
+        void forEach(
+            std::function<void(std::shared_ptr<Resource<T>>)> callBackFunction
+        ) {
+            std::for_each(
+                resourceMap.begin(), 
+                resourceMap.end(), 
+                [&](auto pairElement) {
+                    callBackFunction(std::get<1>(pairElement));
+                }
+            );
+        }
     };
 }

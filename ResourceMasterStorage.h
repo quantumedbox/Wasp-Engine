@@ -1,6 +1,7 @@
 #pragma once
 
-#include <unordered_map>
+#include "WicBitmapStorage.h"
+#include "D2DBitmapStorage.h"
 
 #include "FileLoadable.h"
 #include "ManifestLoadable.h"
@@ -15,5 +16,12 @@ namespace resource {
 	public:
 		IResource* loadFile(const FileOrigin& fileOrigin);
 		IResource* loadManifestEntry(const ManifestOrigin& manifestOrigin);
+	};
+}
+
+namespace gameresource {
+	struct ResourceMasterStorage {
+		WicBitmapStorage wicBitmapStorage;
+		D2DBitmapStorage d2dBitmapStorage;
 	};
 }
