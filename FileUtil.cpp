@@ -1,3 +1,5 @@
+#include <shlwapi.h>
+
 #include "FileUtil.h"
 
 #include "framework.h"
