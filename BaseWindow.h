@@ -3,12 +3,12 @@
 #include "framework.h" //includes window.h and others
 #include <stdexcept>
 
-namespace windowadapter {
+namespace wasp::windowadapter {
     template<class DERIVED_CLASS>
     class BaseWindow {
 
     protected:
-        //set in WindowProc //derivedInstancePointer->windowHandle = windowHandle;
+        //set in WindowProc : derivedInstancePointer->windowHandle = windowHandle;
         HWND windowHandle;
 
     public:

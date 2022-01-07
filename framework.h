@@ -15,6 +15,8 @@ typedef struct IUnknown IUnknown;
 #else
 #include "build/sources/ccomptr.h"
 #endif
+#include <dwrite.h>
+#pragma comment(lib, "Dwrite")
 #include <d2d1.h>
 #pragma comment(lib, "d2d1")
 

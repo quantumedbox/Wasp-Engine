@@ -1,14 +1,13 @@
 #pragma once
 
-#include "WicBitmapStorage.h"
-#include "D2DBitmapStorage.h"
+#include "DirectoryStorage.h"
+#include "ManifestStorage.h"
+#include "BitmapStorage.h"
 
-#include "FileLoadable.h"
-#include "ManifestLoadable.h"
-
-namespace gameresource {
+namespace wasp::game::gameresource {
 	struct ResourceMasterStorage {
-		WicBitmapStorage wicBitmapStorage;
-		D2DBitmapStorage d2dBitmapStorage;
+		DirectoryStorage directoryStorage;
+		ManifestStorage manifestStorage;
+		BitmapStorage bitmapStorage;
 	};
 }

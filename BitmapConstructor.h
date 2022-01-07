@@ -3,7 +3,7 @@
 #include "framework.h"
 #include <string>
 
-namespace graphics {
+namespace wasp::graphics {
 	class BitmapConstructor {
 	private:
 		CComPtr<IWICImagingFactory> wicFactoryPointer{};
@@ -18,8 +18,8 @@ namespace graphics {
 		);
 
 		CComPtr<ID2D1Bitmap> converWicBitmapToD2D(
-			const CComPtr<IWICFormatConverter>& formatConverterPointer,
-			const CComPtr<ID2D1HwndRenderTarget>& renderTargetPointer
+			const CComPtr<IWICFormatConverter> formatConverterPointer,
+			const CComPtr<ID2D1HwndRenderTarget> renderTargetPointer
 		);
 
 	private:
@@ -31,8 +31,8 @@ namespace graphics {
 			const std::wstring& fileName
 		);
 		void initWicFormatConverter(
-			const CComPtr<IWICFormatConverter>& wicFormatConverterPointer, 
-			const CComPtr<IWICBitmapFrameDecode>& framePointer
+			const CComPtr<IWICFormatConverter> wicFormatConverterPointer, 
+			const CComPtr<IWICBitmapFrameDecode> framePointer
 		);
 	};
 }

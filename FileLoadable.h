@@ -5,9 +5,9 @@
 #include <memory>
 
 #include "Loadable.h"
-#include "IResource.h"
+#include "ResourceBase.h"
 
-namespace resource {
+namespace wasp::resource {
 
 	using FileTypes = std::vector<std::wstring>;
 	class ResourceLoader;
@@ -33,7 +33,7 @@ namespace resource {
 		const FileTypes& getAcceptableFileTypes() const {
 			return fileTypes;
 		}
-		virtual IResource* loadFromFile(
+		virtual ResourceBase* loadFromFile(
 			const FileOrigin& fileOrigin, 
 			const ResourceLoader& resourceLoader
 		) = 0;

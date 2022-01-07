@@ -1,20 +1,25 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
-namespace file{
-    const std::wstring DIRECTORY_EXTENSION{ L"directory" };
+namespace wasp::file{
+    const std::wstring directoryExtension{ L"directory" };
 
     std::wstring getFileName(const std::wstring& fileName);
 
     std::wstring getFileExtension(const std::wstring& fileName);
 
+    void forEachDirectoryEntry(
+        const std::wstring& directoryName,
+        std::function<void(const std::wstring& fileName)> callBackFunction
+    );
+
     void throwIfFileDoesNotExist(const std::wstring& fileName);
 
 
     /*
-    * //todo: translate the following; move from BitmapManager
-    public static BufferedImage parseImage(File imageFile); 
+    * //todo: ini file?
 
     public static Properties parseProperties(File propertiesFile);
 
