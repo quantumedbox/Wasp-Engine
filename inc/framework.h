@@ -13,7 +13,7 @@ typedef struct IUnknown IUnknown;
 #ifdef _MSC_VER
 #include <atlbase.h>
 #else
-#include "build/sources/ccomptr.h"
+#include "ccomptr.h"
 #endif
 #include <dwrite.h>
 #pragma comment(lib, "Dwrite")

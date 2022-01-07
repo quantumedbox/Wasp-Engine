@@ -370,3 +370,6 @@ FodyWeavers.xsd
 #Custom Ignore
 *.png
 *.mid
+*.sublime-project
+*.sublime-workspace
+*.exe

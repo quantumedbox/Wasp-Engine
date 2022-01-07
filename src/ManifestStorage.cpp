@@ -66,7 +66,8 @@ namespace wasp::game::gameresource {
 		resource::ChildList& childList,
 		const resource::ResourceLoader& resourceLoader
 	) {
-		std::wifstream inStream{fileName};
+
+		std::wifstream inStream{fileName.c_str()};
 		std::wstring line{};
 
 		while (std::getline(inStream, line)) {

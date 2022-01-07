@@ -1,10 +1,28 @@
-source_dir := ../../
-include_dir := ../../
-to_link := -lkernel32 -lgdi32 -ld2d1 -lole32 -loleaut32 -lWindowscodecs -lShlwapi
-outut_path := ../../
-outut_name := WASP
+SRCDIR := ../../src
+INCDIR := ../../inc
+OUTDIR := ../..
+
+CXX_FLAGS := -Wall -std=c++17
+CXX_LINKFLAGS := -municode -lkernel32 -lgdi32 -ld2d1 -lole32 -loleaut32 -lWindowscodecs -lShlwapi -lDwrite
+
+SRCS := $(wildcard $(SRCDIR)/*.cpp)
+OBJS := ${SRCS:.cpp=.o}
+DEPS = $(wildcard $(OBJS:%=%.d))
+
+.PHONY: all debug clean
 
 all: debug
 
-debug:
-	g++ -std=c++17 $(wildcard $(source_dir)*.cpp) -Wall -g3 -I:$(include_dir) $(to_link) -municode -o $(outut_path)$(outut_name)
+debug: CXX_FLAGS += -g3
+debug: wasp.exe
+
+wasp.exe: $(OBJS)
+	g++ $^ -o $(OUTDIR)/$@ $(CXX_FLAGS) -I $(INCDIR) $(CXX_LINKFLAGS)
+
+%.o: %.cpp
+	g++ -MD -MP -MF $@.d -c $< -o $@ $(CXX_FLAGS) -I $(INCDIR) $(CXX_LINKFLAGS)
+
+clean:
+	$(RM) $(OBJS) $(DEPS)
+
+include $(DEPS)
