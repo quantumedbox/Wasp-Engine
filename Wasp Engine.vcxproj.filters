@@ -19,12 +19,6 @@
     <Filter Include="Header Files\Resource">
       <UniqueIdentifier>{e470b461-5a48-40de-95f9-df4bda0f8025}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\WindowAdapter">
-      <UniqueIdentifier>{d4f585f4-e54f-41b9-bec5-3e9684a726cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\WindowAdapter">
-      <UniqueIdentifier>{d5989d98-d176-4408-a6c6-3085f9dee4f8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\File">
       <UniqueIdentifier>{5b437807-9542-483e-bf14-3c7d7877e74b}</UniqueIdentifier>
     </Filter>
@@ -46,11 +40,32 @@
     <Filter Include="Header Files\Geometry">
       <UniqueIdentifier>{edead95b-70c7-4a63-9559-0c0cd3fc403f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Game\Resource">
+    <Filter Include="Header Files\Window">
+      <UniqueIdentifier>{d4f585f4-e54f-41b9-bec5-3e9684a726cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Window">
+      <UniqueIdentifier>{d5989d98-d176-4408-a6c6-3085f9dee4f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{c337cbc2-044e-4f41-bd6c-7b3ab82a8b30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{c852accd-9d5c-4a01-93aa-5fb9636ad533}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Sound">
+      <UniqueIdentifier>{6d813fc3-c0ea-41b3-87fa-d4f7e57a558d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Sound">
+      <UniqueIdentifier>{981475f0-fffa-4107-b95a-ee19132e39f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\GameResource">
+      <UniqueIdentifier>{b8640455-c033-4f33-90e7-64f26d993a3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\GameResource">
       <UniqueIdentifier>{d25e73b7-a489-4e36-b8db-9ab1e4971cb5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Game\Resource">
-      <UniqueIdentifier>{b8640455-c033-4f33-90e7-64f26d993a3c}</UniqueIdentifier>
+    <Filter Include="Header Files\Utility">
+      <UniqueIdentifier>{9bcfa56f-3e6e-48fd-bd6a-acd465a079a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -61,13 +76,13 @@
       <Filter>Source Files\Resource</Filter>
     </ClCompile>
     <ClCompile Include="MainWindow.cpp">
-      <Filter>Source Files\WindowAdapter</Filter>
+      <Filter>Source Files\Window</Filter>
     </ClCompile>
     <ClCompile Include="WindowPainter.cpp">
-      <Filter>Source Files\WindowAdapter</Filter>
+      <Filter>Source Files\Window</Filter>
     </ClCompile>
     <ClCompile Include="WindowUtil.cpp">
-      <Filter>Source Files\WindowAdapter</Filter>
+      <Filter>Source Files\Window</Filter>
     </ClCompile>
     <ClCompile Include="FileUtil.cpp">
       <Filter>Source Files\File</Filter>
@@ -79,13 +94,25 @@
       <Filter>Source Files\Resource</Filter>
     </ClCompile>
     <ClCompile Include="BitmapStorage.cpp">
-      <Filter>Source Files\Game\Resource</Filter>
+      <Filter>Source Files\Game\GameResource</Filter>
     </ClCompile>
     <ClCompile Include="DirectoryStorage.cpp">
-      <Filter>Source Files\Game\Resource</Filter>
+      <Filter>Source Files\Game\GameResource</Filter>
     </ClCompile>
     <ClCompile Include="ManifestStorage.cpp">
-      <Filter>Source Files\Game\Resource</Filter>
+      <Filter>Source Files\Game\GameResource</Filter>
+    </ClCompile>
+    <ClCompile Include="GameLoop.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyInputTable.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="MidiSequencer.cpp">
+      <Filter>Source Files\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="MidiSequence.cpp">
+      <Filter>Source Files\Sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -117,16 +144,16 @@
       <Filter>Header Files\Resource</Filter>
     </ClInclude>
     <ClInclude Include="WindowPainter.h">
-      <Filter>Header Files\WindowAdapter</Filter>
+      <Filter>Header Files\Window</Filter>
     </ClInclude>
     <ClInclude Include="WindowUtil.h">
-      <Filter>Header Files\WindowAdapter</Filter>
+      <Filter>Header Files\Window</Filter>
     </ClInclude>
     <ClInclude Include="MainWindow.h">
-      <Filter>Header Files\WindowAdapter</Filter>
+      <Filter>Header Files\Window</Filter>
     </ClInclude>
     <ClInclude Include="BaseWindow.h">
-      <Filter>Header Files\WindowAdapter</Filter>
+      <Filter>Header Files\Window</Filter>
     </ClInclude>
     <ClInclude Include="HResultError.h">
       <Filter>Header Files</Filter>
@@ -180,16 +207,46 @@
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="ResourceMasterStorage.h">
-      <Filter>Header Files\Game\Resource</Filter>
+      <Filter>Header Files\Game\GameResource</Filter>
     </ClInclude>
     <ClInclude Include="ManifestStorage.h">
-      <Filter>Header Files\Game\Resource</Filter>
+      <Filter>Header Files\Game\GameResource</Filter>
     </ClInclude>
     <ClInclude Include="DirectoryStorage.h">
-      <Filter>Header Files\Game\Resource</Filter>
+      <Filter>Header Files\Game\GameResource</Filter>
     </ClInclude>
     <ClInclude Include="BitmapStorage.h">
-      <Filter>Header Files\Game\Resource</Filter>
+      <Filter>Header Files\Game\GameResource</Filter>
+    </ClInclude>
+    <ClInclude Include="IKeyInputReceiver.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="IKeyInputTable.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyState.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyInputTable.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyValues.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="MidiSequencer.h">
+      <Filter>Header Files\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="IMidiSequencer.h">
+      <Filter>Header Files\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="MidiSequence.h">
+      <Filter>Header Files\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="ByteSwap.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Debug.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
