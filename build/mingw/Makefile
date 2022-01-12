@@ -3,7 +3,7 @@ INCDIR := ../../inc
 OUTDIR := ../..
 
 CXX_FLAGS := -Wall -std=c++17
-CXX_LINKFLAGS := -municode -lkernel32 -lgdi32 -ld2d1 -lole32 -loleaut32 -lWindowscodecs -lShlwapi -lDwrite
+CXX_LINKFLAGS := -municode -static -lkernel32 -lgdi32 -ld2d1 -lole32 -loleaut32 -lWindowscodecs -lShlwapi -lDwrite -Wl,-Bstatic -static-libstdc++ -static-libgcc
 
 SRCS := $(wildcard $(SRCDIR)/*.cpp)
 OBJS := ${SRCS:.cpp=.o}
