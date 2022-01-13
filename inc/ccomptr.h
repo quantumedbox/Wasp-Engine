@@ -35,7 +35,11 @@ public:
 
     CComPtr& operator= (CComPtr&& c) noexcept
     {
-        m_pointer = std::move(c.m_pointer);
+        if (c.m_pointer != m_pointer) {
+            if (m_pointer != nullptr)
+                Release();
+            m_pointer = std::exchange(c.m_pointer, nullptr);
+        }
         return *this;
     }
 
