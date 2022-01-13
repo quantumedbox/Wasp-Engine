@@ -39,6 +39,10 @@ void initConsoleOutput();
 int WINAPI wWinMain(HINSTANCE instanceHandle, HINSTANCE, PWSTR, int windowShowMode) {
     initConsoleOutput();
 
+    #ifdef _DEBUG
+    debug::initConsoleOutput();
+    #endif
+
     //init COM
     win32adaptor::ComLibraryGuard comLibraryGuard{};
     comLibraryGuard.init(COINIT_APARTMENTTHREADED);
