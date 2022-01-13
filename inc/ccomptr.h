@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <utility>
 
 template<class TInterface>
 class CComPtr
@@ -8,10 +9,35 @@ class CComPtr
 private:
     TInterface* m_pointer;
 public:
-    // CComPtr(const CComPtr&) = delete; // Copy constructor
-    // CComPtr& operator= (const CComPtr&) = delete; // Copy assignment
-    // CComPtr(CComPtr&&) = delete; // Move constructor
-    // CComPtr& operator= (CComPtr&&) = delete; // Move assignment
+    CComPtr(const CComPtr& c) noexcept
+    {
+        m_pointer = c.m_pointer;
+        if (m_pointer != nullptr)
+            m_pointer->AddRef();
+    }
+
+    CComPtr& operator= (const CComPtr& c) noexcept
+    {
+        if (c.m_pointer != m_pointer) {
+            if (m_pointer != nullptr)
+                Release();
+            m_pointer = c.m_pointer;
+            if (m_pointer != nullptr)
+                m_pointer->AddRef();
+        }
+        return *this;
+    }
+
+    CComPtr(CComPtr&& c) noexcept
+    {
+        m_pointer = std::exchange(c.m_pointer, nullptr);
+    }
+
+    CComPtr& operator= (CComPtr&& c) noexcept
+    {
+        m_pointer = std::move(c.m_pointer);
+        return *this;
+    }
 
     void* operator new(std::size_t) = delete;
     void* operator new[](std::size_t) = delete;
@@ -19,72 +45,74 @@ public:
     void operator delete(void *ptr) = delete;
     void operator delete[](void *ptr) = delete;
 
-    CComPtr()
+    CComPtr() noexcept
     {
         m_pointer = nullptr;
     }
 
     CComPtr(TInterface* pointer)
     {
+        if (pointer != nullptr)
+            pointer->AddRef();
         m_pointer = pointer;
     }
 
     ~CComPtr()
     {
-        if (m_pointer)
-        {
-            // m_pointer->Release();
+        if (m_pointer != nullptr) {
+            m_pointer->Release();
             m_pointer = nullptr;
         }
     }
 
-    Attach(TInterface* pointer)
+    void Attach(TInterface* pointer) noexcept
     {
         m_pointer = pointer;
     }
 
-    operator TInterface*()
-    {
-        return m_pointer;
-    }
-
-    operator TInterface*() const
-    {
-        return m_pointer;
-    }
-
-    TInterface& operator*()
-    {
-        return *m_pointer;
-    }
-
-    TInterface& operator*() const
-    {
-        return *m_pointer;
-    }
-
-    TInterface** operator&()
-    {
-        return &m_pointer;
-    }
-
-    TInterface** operator&() const
-    {
-        return &m_pointer;
-    }
-
-    TInterface* operator->()
-    {
-        return m_pointer;
-    }
-
-    TInterface* operator->() const
-    {
-        return m_pointer;
-    }
-
     void Release()
     {
-        ~CComPtr();
+        this->~CComPtr();
     }
+
+    operator TInterface*() noexcept
+    {
+        return m_pointer;
+    }
+
+    operator TInterface*() const noexcept
+    {
+        return m_pointer;
+    }
+
+    TInterface& operator*() noexcept
+    {
+        return *m_pointer;
+    }
+
+    TInterface& operator*() const noexcept
+    {
+        return *m_pointer;
+    }
+
+    TInterface** operator&() noexcept
+    {
+        return &m_pointer;
+    }
+
+    TInterface** operator&() const noexcept
+    {
+        return &m_pointer;
+    }
+
+    TInterface* operator->() noexcept
+    {
+        return m_pointer;
+    }
+
+    TInterface* operator->() const noexcept
+    {
+        return m_pointer;
+    }
+
 };
