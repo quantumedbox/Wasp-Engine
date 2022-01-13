@@ -373,3 +373,4 @@ FodyWeavers.xsd
 *.sublime-project
 *.sublime-workspace
 *.exe
+test/*

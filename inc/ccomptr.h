@@ -33,7 +33,7 @@ public:
     {
         if (m_pointer)
         {
-            m_pointer->Release();
+            // m_pointer->Release();
             m_pointer = nullptr;
         }
     }

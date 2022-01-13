@@ -5,7 +5,7 @@
 typedef struct IUnknown IUnknown;
 
 #include "targetver.h"
-#define WIN32_LEAN_AND_MEAN   // Exclude rarely-used stuff from Windows headers
+// #define WIN32_LEAN_AND_MEAN   // Exclude rarely-used stuff from Windows headers
 // Windows Header Files
 #include <windows.h>
 #include <wincodec.h>
@@ -15,7 +15,7 @@ typedef struct IUnknown IUnknown;
 #else
 #include "ccomptr.h"
 #endif
-#include <mmeapi.h>
+// #include <mmeapi.h>
 #pragma comment(lib, "winmm")
 #include <dwrite.h>
 #pragma comment(lib, "Dwrite")
