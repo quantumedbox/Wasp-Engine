@@ -4,11 +4,9 @@
 
 //todo: midi test
 #include <ios>
-#include <iostream>
 #include <fstream>
-#include "MidiSequence.h"
-
 #include <thread>
+
 #include "framework.h" //includes window.h and others
 
 #include "Config.h"
@@ -21,6 +19,7 @@
 #include "KeyInputTable.h"
 #include "MidiSequencer.h"
 #include "GameLoop.h"
+#include "MidiSequence.h"
 
 #ifdef _DEBUG
 #include "Debug.h"
@@ -235,10 +234,9 @@ void initConsoleOutput() {
     if (!AllocConsole())
         throw std::runtime_error("error allocating console");
 
-    freopen("CONIN$", "r", stdin);
-    freopen("CONOUT$", "w", stdout);
-
-    // todo: for some reason CONERR$ isn't recognized as console handle, so, std::cerr writes
-    // aren't shown on console, dunno what to do about that
-    // freopen("CONERR$", "w", stderr);
+    FILE* stream;
+    if(freopen_s(&stream, "CONOUT$", "w", stdout))
+        throw std::runtime_error("error redirecting stdout to conout");
+    if(freopen_s(&stream, "CONOUT$", "w", stderr))
+        throw std::runtime_error("error redirecting stderr to conout");
 }
