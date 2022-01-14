@@ -1,9 +1,13 @@
 #include "MidiSequence.h"
 
+#include <iostream>
+
 #include "ByteSwap.h"
 #include "MidiConstants.h"
 
 namespace wasp::sound::midi {
+
+	constexpr int trackSizeByteMultiplier = 4;
 
 	using wasp::utility::byteSwap16;
 	using wasp::utility::byteSwap32;
@@ -54,11 +58,6 @@ namespace wasp::sound::midi {
 		//handle the case when the file header is longer than expected
 		if (header.size > minimumHeaderSize) {
 			inStream.ignore(header.size - minimumHeaderSize);
-		}
-
-		//todo: we block multi-track here
-		if (header.format != formatSingleTrack) {
-			throw new std::runtime_error{ "for this test only take single track" };
 		}
 
 		return header;
@@ -117,12 +116,15 @@ namespace wasp::sound::midi {
 		return eventUnit;
 	}
 
-	static std::vector<MidiSequence::EventUnit> loadTrack(std::istream& inStream) {
+	static MidiSequence::EventUnitTrack loadTrack(std::istream& inStream) {
 		//read in track header, assuming 1 track
 		MidiTrackHeader trackHeader{ readTrackHeader(inStream) };
 
 		//load track
-		size_t vectorLength{ trackHeader.length * 3 / sizeof(MidiSequence::EventUnit) };
+		size_t vectorLength{ 
+			trackHeader.length * trackSizeByteMultiplier 
+			/ sizeof(MidiSequence::EventUnit) 
+		};
 		std::vector<MidiSequence::EventUnit> translatedTrack(vectorLength);
 
 		uint8_t lastStatus{ 0 };
@@ -181,6 +183,7 @@ namespace wasp::sound::midi {
 					//remove the delta time we set at the start
 					translatedTrack[index] = {};
 					encounteredEndOfTrack = true;
+					//don't advance index
 				}
 
 				//insert everything else
@@ -222,11 +225,11 @@ namespace wasp::sound::midi {
 
 				if (length > 0) {
 					//insert F0 at beginning of data dump
-					translatedTrack[index].deltaTime = systemExclusiveStart << 24;
+					translatedTrack[index].deltaTime = systemExclusiveStart;
 					//read binary data into our translated track
 					inStream.read(
 						reinterpret_cast<char*>(&translatedTrack[index]) + 1,
-						length
+						length - 1 //we modified length so here we subtract 1
 					);
 					//advance index by necessary amount
 					index += indexLength;
@@ -266,12 +269,127 @@ namespace wasp::sound::midi {
 		return translatedTrack;
 	}
 
+	static MidiSequence::EventUnitTrack compileTracks(
+		std::vector<MidiSequence::EventUnitTrack>& individualTracks
+	) {
+		if (individualTracks.size() == 1) {
+			return std::move(individualTracks[0]);
+		}
+		//create track to hold all elements in individualTracks
+		size_t totalSize{ 0 };
+		for (const auto& track : individualTracks) {
+			totalSize += track.size();
+		}
+		MidiSequence::EventUnitTrack compiledTrack(totalSize);
+
+		//initiate delta times
+		std::vector<uint32_t> deltaTimes(individualTracks.size());
+		for (size_t index{ 0 }; index < individualTracks.size(); ++index) {
+			deltaTimes[index] = individualTracks[index][0].deltaTime;
+		}
+
+		//find and insert events by chronological order
+		size_t compiledIndex{ 0 };
+		uint64_t realTime{ 0 };
+		std::vector<size_t> indices(individualTracks.size());
+		while (individualTracks.size() > 1) {
+			//find next event to insert
+			uint32_t lowestDeltaTime{std::numeric_limits<uint32_t>::max()};
+			size_t lowestDeltaTimeIndex{0};
+
+			for (size_t index{ 0 }; index < individualTracks.size(); ++index) {
+				if (deltaTimes[index] < lowestDeltaTime) {
+					lowestDeltaTime = deltaTimes[index];
+					lowestDeltaTimeIndex = index;
+				}
+			}
+
+			std::cout << "lowest delta time: " << lowestDeltaTime << '\n';
+
+			//todo: loop meta events go here
+			
+			//handle deltaTimes and realTime
+			for (auto& deltaTime : deltaTimes) {
+				deltaTime -= lowestDeltaTime;
+			}
+			realTime += lowestDeltaTime;
+
+			auto& trackIndex{ indices[lowestDeltaTimeIndex] };
+			auto& individualTrack{ individualTracks[lowestDeltaTimeIndex] };
+
+			//truncate to just the status byte
+			uint8_t status{ static_cast<uint8_t>(individualTrack[trackIndex].event) };
+
+			//handle normal midi message case
+			if ((status & statusMask) != 0b1111'0000) {
+				//copy into our compiledTrack and advance indices
+				compiledTrack[compiledIndex].deltaTime = lowestDeltaTime;
+				compiledTrack[compiledIndex++].event 
+					= individualTrack[trackIndex++].event;
+			}
+			//handle meta and sysex i.e. message with length
+			else {
+				//copy status block into our compiledTrack and advance indices
+				compiledTrack[compiledIndex].deltaTime = lowestDeltaTime;
+				compiledTrack[compiledIndex++].event
+					= individualTrack[trackIndex++].event;
+				//trackIndex is now pointing to the length block
+				//copy the length block, store index length, and advance indices
+				uint32_t indexLength{ 
+					(
+						compiledTrack[compiledIndex++] = individualTrack[trackIndex++]
+					).event
+				};
+				//trackIndex is now pointing to the first block after the length
+				//copy as many blocks as required by indexLength
+				for (uint32_t i{ 0 }; i < indexLength; ++i) {
+					compiledTrack[compiledIndex++] = individualTrack[trackIndex++];
+				}
+			}
+
+			//either track is over, in which case remove
+			//or update new delta time for next event on the track
+			if (trackIndex >= individualTrack.size()) {
+				deltaTimes.erase(deltaTimes.begin() + lowestDeltaTimeIndex);
+				indices.erase(indices.begin() + lowestDeltaTimeIndex);
+				individualTracks.erase(
+					individualTracks.begin() + lowestDeltaTimeIndex
+				);
+			}
+			else {
+				deltaTimes[lowestDeltaTimeIndex]
+					= individualTrack[trackIndex].deltaTime;
+			}
+		}
+		//1 track left, append all into our compiled track
+		auto& individualTrack{ individualTracks[0] };
+		while (indices[0] < individualTrack.size()) {
+			compiledTrack[compiledIndex++] = individualTrack[indices[0]++];
+		}
+
+		return compiledTrack;
+	}
+
 	std::istream& operator>>(std::istream& inStream, MidiSequence& midiSequence) {
 		//read in header file
 		MidiFileHeader header{ readFileHeader(inStream) };
 		midiSequence.ticks = header.ticks;
 
-		midiSequence.compiledTrack = loadTrack(inStream);
+		if (header.format == formatSingleTrack) {
+			midiSequence.compiledTrack = loadTrack(inStream);
+		}
+		else if (header.format == formatMultiTrackSync) {
+			std::vector<MidiSequence::EventUnitTrack> individualTracks(header.tracks);
+
+			for (uint16_t i{ 0 }; i < header.tracks; ++i) {
+				individualTracks[i] = loadTrack(inStream);
+			}
+
+			midiSequence.compiledTrack = compileTracks(individualTracks);
+		}
+		else {
+			throw std::runtime_error("Error unsupported MIDI format");
+		}
 
 		return inStream;
 	}

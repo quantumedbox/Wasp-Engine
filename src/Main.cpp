@@ -33,12 +33,9 @@ using window::getWindowBorderWidthPadding;
 using window::getWindowBorderHeightPadding;
 
 void pumpMessages();
-void initConsoleOutput();
 
 #pragma warning(suppress : 28251) //suppress inconsistent annotation warning
 int WINAPI wWinMain(HINSTANCE instanceHandle, HINSTANCE, PWSTR, int windowShowMode) {
-    initConsoleOutput();
-
     #ifdef _DEBUG
     debug::initConsoleOutput();
     #endif
@@ -226,21 +223,4 @@ void pumpMessages() {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-}
-
-void initConsoleOutput() {
-    // for some reason console is patrially allocated on GUI window creation, but
-    // isn't well defined to be shown by ShowWindow() or interacted, so, we just make sure
-    // that it will be freshly initialized
-    if (!FreeConsole())
-        throw std::runtime_error("error freeing console");
-
-    if (!AllocConsole())
-        throw std::runtime_error("error allocating console");
-
-    FILE* stream;
-    if(freopen_s(&stream, "CONOUT$", "w", stdout))
-        throw std::runtime_error("error redirecting stdout to conout");
-    if(freopen_s(&stream, "CONOUT$", "w", stderr))
-        throw std::runtime_error("error redirecting stderr to conout");
 }
