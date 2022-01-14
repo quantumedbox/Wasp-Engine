@@ -1,9 +1,11 @@
 #include "MidiSequence.h"
 
 #include <iostream>
+#include <limits>
 
 #include "ByteSwap.h"
 #include "MidiConstants.h"
+#include "compiler.h"
 
 namespace wasp::sound::midi {
 
@@ -15,22 +17,28 @@ namespace wasp::sound::midi {
 
 	using namespace wasp::sound::midi::constants;
 
-	#pragma pack(push, 1)
+	#ifdef __GNUC__
+	#define PACKED( decl ) decl __attribute__((__packed__))
+	#endif
+
+	#ifdef _MSC_VER
+	#define PACKED( decl ) __pragma( pack(push, 1) ) decl __pragma( pack(pop))
+	#endif
+
+	PACKED(
 	struct MidiFileHeader {
 		uint32_t id{};		// identifier "MThd"
 		uint32_t size{};	// always 6 in big-endian format
 		uint16_t format{};	// big-endian format
 		uint16_t tracks{};	// number of tracks, big-endian
 		uint16_t ticks{};	// number of ticks per quarter note, big-endian
-	};
-	#pragma pack(pop)
+	});
 
-	#pragma pack(push, 1)
+	PACKED(
 	struct MidiTrackHeader {
 		uint32_t id{};		// identifier "MTrk"
 		uint32_t length{};	// track length, big-endian
-	};
-	#pragma pack(pop)
+	});
 
 	static MidiFileHeader readFileHeader(std::istream& inStream) {
 		MidiFileHeader header{};
